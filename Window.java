@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 public class Window extends JFrame implements MouseListener {
 	JLabel L1, L2, L4, L5;
-	JFrame frame = new JFrame("Market Index: S&P 500");
+	JFrame frame = new JFrame("Market Index: S&P 500 (2018)");
 	JList<StockItem> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
 	DefaultListModel<StockItem> listModel = new DefaultListModel<>();
@@ -26,8 +26,9 @@ public class Window extends JFrame implements MouseListener {
 
 	public Window() {
 
-
+		
 		list.setModel(listModel);
+		JScrollPane scroll = new JScrollPane(list);
 		
 		try {
 			getMarketData();
@@ -56,10 +57,10 @@ public class Window extends JFrame implements MouseListener {
 			StockItem p = list.getSelectedValue();
 			label.setText(p.toString2());
 		});
-		splitPane.setLeftComponent(new JScrollPane(list));
+		splitPane.setLeftComponent(scroll);
 
 
-		list.setPreferredSize(new Dimension(150,50));
+		scroll.setPreferredSize(new Dimension(150,50));
 
 
 
