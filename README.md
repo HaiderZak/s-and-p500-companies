@@ -6,3 +6,9 @@ It takes the top 30 stocks listed on S&P 500 market index using the most recent 
 The app uses Jaunt API to search through HTML code and pull the relevant data so it can be used inside of the application. A better approach would be to host this data on my own server and update the server a specific number of times per day (or whenever) -- however the goal of this project is to give the client-side all of the power without having to rely on an outside source. 
 
 ![stockapp](https://user-images.githubusercontent.com/37321974/111355726-068ec600-865e-11eb-905d-86054532f7d6.PNG)
+
+How to Download:
+
+git clone https://github.com/HaiderZak/s-and-p500-companies
+
+run Window.java
