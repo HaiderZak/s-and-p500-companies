@@ -1,37 +1,53 @@
 //Zakary Haider
+
+import com.jaunt.Element;
+import com.jaunt.Elements;
+import com.jaunt.JauntException;
+import com.jaunt.Node;
+import com.jaunt.UserAgent;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class Window extends JFrame implements MouseListener {
+	private static final long serialVersionUID = 619845908650249193L;
 	JLabel L1, L2, L4, L5;
-	JFrame frame = new JFrame("Market Index: S&P 500 (2018)");
+	JFrame frame = new JFrame("Market Index: S&P 500");
 	JList<StockItem> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
 	DefaultListModel<StockItem> listModel = new DefaultListModel<>();
-	Font roboto = new Font("Roboto", Font.BOLD, 14);
+	Font roboto = new Font("Roboto", Font.BOLD, 13);
 	JLabel label = new JLabel();
 	JPanel panel = new JPanel();
 	ArrayList<ArrayList<String>> result;
+	ArrayList<String> listOfSymbols;
+	Timer timer;
+	final int DELAY = 10;
+	int x = 0;
+	String[][] data;
+	ArrayList<String> originalList;
+	ArrayList<String> vol;
+	ArrayList<String> mktcp;
+	ArrayList<String> peTList;
+	ArrayList<String> peFList;
+	final int numStocks = 30;
 
 	public Window() {
 
-		
+
 		list.setModel(listModel);
 		JScrollPane scroll = new JScrollPane(list);
-		
+
 		try {
-			getMarketData();
+			getSymbols();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -39,30 +55,43 @@ public class Window extends JFrame implements MouseListener {
 		String symbol = "";
 		String name = "";
 		String price = "";
-		String pe = "";
+		String peTrailing = "";
+		String peForward = "";
 		String mktcap = "";
-		
-		for(int i=1; i<result.size(); i++) {
-			//System.out.println(result.get(1).get(0));
-			symbol = result.get(i).get(0);
-			name = result.get(i).get(1);
-			price = result.get(i).get(3);
-			pe = result.get(i).get(4);
-			mktcap = result.get(i).get(9);
-			
-			listModel.addElement(new StockItem(symbol,name,price,pe,mktcap));
+		String volume = "";
+
+		try {
+			getMarketPrice();
+			getRestOfMarketData();
+			getStockName();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		list.getSelectionModel().addListSelectionListener(e -> {
-			StockItem p = list.getSelectedValue();
-			label.setText(p.toString2());
-		});
-		splitPane.setLeftComponent(scroll);
+		for(int i=0; i<data.length; i++) {
+			symbol = data[i][0];
+			name = data[i][1];
+			price = data[i][2];
+			peTrailing = data[i][3];
+			peForward = data[i][4];
+			mktcap = data[i][5];
+			volume = data[i][6];
+			listModel.addElement(new StockItem(symbol,name,price,peTrailing,peForward,mktcap,volume));
+		}
 
+
+		splitPane.setLeftComponent(scroll);
+		EventQueue.invokeLater( new Runnable () {
+
+			@Override
+			public void run() {
+				slidingText();
+			}
+
+		});
 
 		scroll.setPreferredSize(new Dimension(150,50));
-
-
 
 		panel.add(label);
 
@@ -77,31 +106,172 @@ public class Window extends JFrame implements MouseListener {
 		frame.setResizable(false);
 	}
 
-	public void getMarketData() throws UnsupportedEncodingException, IOException{
-		URL url = new URL("https://raw.githubusercontent.com/datasets/s-and-p-500-companies-financials/master/data/constituents-financials.csv");
-		result = new ArrayList<ArrayList<String>>();
+	public void slidingText()
+	{
+		list.getSelectionModel().addListSelectionListener(e -> {
+			if(timer != null) {
+				timer.stop();
+			}
+			timer = new Timer( DELAY, new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					StockItem p = list.getSelectedValue();
+					label.setText(p.toString2());
+					label.setFont(roboto);
+					label.setForeground(Color.blue);
+					label.setLocation(label.getLocation().x+1, label.getLocation().y);
+					if(label.getLocation().x >= frame.getWidth()) {
+						label.setLocation(0-label.getWidth(),label.getLocation().y);
+					}
+				}
+			});
+			timer.start();
+		});
+	}
+	
+	public void getStockName() throws UnsupportedEncodingException, IOException{
+		try {
+			UserAgent userAgent = new UserAgent(); 
+			for(int i=0; i<numStocks; i++) {
+				userAgent.visit("https://www.slickcharts.com/symbol/" + listOfSymbols.get(i));
+				Element meta = userAgent.doc.findFirst("<h3");
+				data[i][1] = meta.getChildText();
+			}
+		} catch (JauntException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void getRestOfMarketData() throws UnsupportedEncodingException, IOException{
+		try {
+			UserAgent userAgent = new UserAgent();
+			originalList = new ArrayList<String>();
+			for(int i=0; i<numStocks; i++) {
+				userAgent.visit("https://www.slickcharts.com/symbol/" + listOfSymbols.get(i));
+				Element meta = userAgent.doc.findFirst("<tbody>");
+				ArrayList<Node> childNodes = (ArrayList<Node>) meta.getChildNodes();
+				for(Node node : childNodes) {
+					if(node.getType() == Node.ELEMENT_TYPE) {
+						originalList.add(((Element)node).outerHTML());
+					}
+				}
+			}
+			char[] charArr = originalList.toString().toCharArray();
+			String bufferString = new String(charArr).replaceAll(" ", "");
+			Scanner scanner = new Scanner(bufferString);
+			ArrayList<String> finalArr = new ArrayList<String>();
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				finalArr.add(line);
+			}
+			scanner.close();
+			String volume = "";
+			String peTrailing = "";
+			String peForward = "";
+			String mktcap = "";
+			vol = new ArrayList<String>();
+			mktcp = new ArrayList<String>();
+			peTList = new ArrayList<String>();
+			peFList = new ArrayList<String>();
+			for(int i=0; i<finalArr.size()-1; i++) {
+				if(finalArr.get(i).contains("Volume")) {
+					volume = finalArr.get(i+1).replaceAll("\\D+","");
+					vol.add(volume);
+				}
+				if(finalArr.get(i).contains("Market")) {
+					mktcap = finalArr.get(i+1).replaceAll("\\D+","");
+					mktcp.add(mktcap);
+				}
+				if(finalArr.get(i).contains("Trailing")) {
+					peTrailing = finalArr.get(i+1).replaceAll("\\D+","");
+					peTList.add(peTrailing);
+				}
+				if(finalArr.get(i).contains("Forward")) {
+					peForward = finalArr.get(i+1).replaceAll("\\D+","");
+					peFList.add(peForward);
+				}
+			}
+			for(int i=0; i<mktcp.size(); i++) {
+				data[i][5] = mktcp.get(i);
+			}
+			for(int i=0; i<vol.size(); i++) {
+				data[i][6] = vol.get(i);
+			}
+			for(int i=0; i<peTList.size(); i++) {
+				data[i][3] = peTList.get(i);
+			}
+			for(int i=0; i<peFList.size(); i++) {
+				data[i][4] = peFList.get(i);
+			}
+		}
+		catch (JauntException e) {
+			e.printStackTrace();
+		}
+	}
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
+	//get and set symbols and price data
+	public void getMarketPrice() throws UnsupportedEncodingException, IOException{
+		try {
+			UserAgent userAgent = new UserAgent();                      
+			data = new String[listOfSymbols.size()][7];
+			for(int i=0; i<numStocks; i++) {
+				userAgent.visit("https://www.slickcharts.com/symbol/" + listOfSymbols.get(i));
+				Element meta = userAgent.doc.findEvery("<tr>").findFirst("<td>");
+				data[i][0] = listOfSymbols.get(i);
+				data[i][2] = meta.getChildText();
+			}
+		} catch (JauntException e) {
+			e.printStackTrace();
+		}
+	}
+
+	//get symbols
+	public void getSymbols() throws UnsupportedEncodingException, IOException{
+		try {
+			UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
+			userAgent.visit("https://www.slickcharts.com/sp500");
+			Elements meta = userAgent.doc.findEvery("<tbody>").findEvery("<tr>").findEvery("<td>").findEvery("<a href=");	
 			int i = 0;
-			for (String line; (line = reader.readLine()) != null;) {
-				result.add(new ArrayList<String>());
-				for(int j=0; j<14; j++) {
-					String[] arr = line.split(",");
-					result.get(i).add(arr[j]);
+			listOfSymbols = new ArrayList<String>();
+			for(Element link : meta) {
+				if(i%2 != 0) {
+					listOfSymbols.add(link.getChildText());
 				}
 				i++;
 			}
 		}
-	}
+		catch (JauntException e) {
+			e.printStackTrace();
+		}
 
+	}
 	public static void main(String[] args) throws UnsupportedEncodingException, IOException {
-		new Window();
+		EventQueue.invokeLater( new Runnable () {
+
+			@Override
+			public void run() {
+				new Window();
+			}
+
+		});
 	}
 
-	public void paint(Graphics d) {
-		d.setColor(Color.red);        //default color for drawing
-		super.paint(d);
-		this.setVisible(true);
+	public void paint(Graphics g) {
+		//		super.paint(g);
+		//		Graphics2D g2 = (Graphics2D) g;
+		//		g2.setFont(roboto);
+		//		g2.setColor(Color.green);
+		//		g2.drawString("Test", x, y);
+		//		try{
+		//			Thread.sleep(100);
+		//		}
+		//		catch(Exception ex) {}
+		//		x+=10;
+		//		if(x>500) {
+		//			x=0;
+		//		}
+		//		repaint();
 	}
 
 	@Override
@@ -111,7 +281,6 @@ public class Window extends JFrame implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
 	}
 
 	@Override
