@@ -1,3 +1,5 @@
+package src;
+
 //Zakary Haider
 
 public class StockItem {

@@ -1,3 +1,5 @@
+package src;
+
 //Zakary Haider
 
 import com.jaunt.Element;
@@ -41,7 +43,6 @@ public class Window extends JFrame implements MouseListener {
 
 	public Window() {
 		list.setModel(listModel);
-		JScrollPane scroll = new JScrollPane(list);
 		
 		String symbol = "";
 		String name = "";
@@ -72,7 +73,7 @@ public class Window extends JFrame implements MouseListener {
 		}
 
 
-		splitPane.setLeftComponent(scroll);
+		splitPane.setLeftComponent(list);
 		EventQueue.invokeLater( new Runnable () {
 
 			@Override
@@ -82,7 +83,7 @@ public class Window extends JFrame implements MouseListener {
 
 		});
 
-		scroll.setPreferredSize(new Dimension(150,50));
+		list.setPreferredSize(new Dimension(150,50));
 
 		panel.add(label);
 
