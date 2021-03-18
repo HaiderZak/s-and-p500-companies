@@ -9,6 +9,6 @@ The app uses Jaunt API to search through HTML code and pull the relevant data so
 
 git clone https://github.com/HaiderZak/s-and-p500-companies
 
-simply goto stockapp -> src -> and run stockapp.jar
+Simply goto src directory and run stockapp.jar
 
 ![Top 15 stocks in SP 500 Market Index 2021-03-18 19-16-29_Trim](https://user-images.githubusercontent.com/37321974/111709889-e1958100-881e-11eb-8e91-b92580658ad2.gif)
