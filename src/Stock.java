@@ -2,9 +2,9 @@ package src;
 
 //Zakary Haider
 
-public class StockItem {
+public class Stock {
 	String symbol, name, peTrailing, peForward, mktcap, price, volume;
-	public StockItem(String symbol, String name, String price, String peTrailing, String peForward, String mktcap, String volume) {
+	public Stock(String symbol, String name, String price, String peTrailing, String peForward, String mktcap, String volume) {
 		this.symbol=symbol;
 		this.name = name;
 		this.price = price;

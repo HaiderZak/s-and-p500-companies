@@ -17,14 +17,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Window extends JFrame implements MouseListener {
+public class Main extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 619845908650249193L;
-	JLabel L1, L2, L4, L5;
 	final int numStocks = 30;
 	JFrame frame = new JFrame("Top " + numStocks + " stocks in S&P 500 Market Index");
-	JList<StockItem> list = new JList<>();
+	JList<Stock> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
-	DefaultListModel<StockItem> listModel = new DefaultListModel<>();
+	DefaultListModel<Stock> listModel = new DefaultListModel<>();
 	Font roboto = new Font("Roboto", Font.BOLD, 13);
 	JLabel label = new JLabel();
 	JPanel panel = new JPanel();
@@ -41,7 +40,7 @@ public class Window extends JFrame implements MouseListener {
 	ArrayList<String> peFList;
 	ArrayList<String> finalList;
 
-	public Window() throws IOException {
+	public Main() throws IOException {
 		list.setModel(listModel);
 		
 		String symbol = "";
@@ -70,14 +69,14 @@ public class Window extends JFrame implements MouseListener {
 			peForward = data[i][4];
 			mktcap = data[i][5];
 			volume = data[i][6];
-			listModel.addElement(new StockItem(symbol,name,price,peTrailing,peForward,mktcap,volume));
+			listModel.addElement(new Stock(symbol,name,price,peTrailing,peForward,mktcap,volume));
 		}
 		
 		JLabel label1 = new JLabel();
 
 		splitPane.setLeftComponent(list);
 		list.getSelectionModel().addListSelectionListener(e -> {
-			StockItem p = list.getSelectedValue();
+			Stock p = list.getSelectedValue();
 			try {
 				String s = "resources/" + p.getSymbol() + ".png";
 				ImageIcon wPic = new ImageIcon(this.getClass().getResource(s));
@@ -218,7 +217,8 @@ public class Window extends JFrame implements MouseListener {
 				}
 				i++;
 			}
-		    FileWriter myWriter = new FileWriter("symbols.txt");
+		    @SuppressWarnings("resource")
+			FileWriter myWriter = new FileWriter("symbols.txt");
 		    int j = 0;
 			for(j=0; j<numStocks-1; j++){
 			      myWriter.write(listOfSymbols.get(j) + ",");
@@ -241,7 +241,7 @@ public class Window extends JFrame implements MouseListener {
 			@Override
 			public void run() {
 				try {
-					new Window();
+					new Main();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -249,23 +249,6 @@ public class Window extends JFrame implements MouseListener {
 			}
 
 		});
-	}
-
-	public void paint(Graphics g) {
-		//		super.paint(g);
-		//		Graphics2D g2 = (Graphics2D) g;
-		//		g2.setFont(roboto);
-		//		g2.setColor(Color.green);
-		//		g2.drawString("Test", x, y);
-		//		try{
-		//			Thread.sleep(100);
-		//		}
-		//		catch(Exception ex) {}
-		//		x+=10;
-		//		if(x>500) {
-		//			x=0;
-		//		}
-		//		repaint();
 	}
 
 	@Override
