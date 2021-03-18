@@ -9,10 +9,9 @@ import com.jaunt.Node;
 import com.jaunt.UserAgent;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.Scanner;
 public class Window extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 619845908650249193L;
 	JLabel L1, L2, L4, L5;
-	final int numStocks = 5;
+	final int numStocks = 30;
 	JFrame frame = new JFrame("Top " + numStocks + " stocks in S&P 500 Market Index");
 	JList<StockItem> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
@@ -40,8 +39,9 @@ public class Window extends JFrame implements MouseListener {
 	ArrayList<String> mktcp;
 	ArrayList<String> peTList;
 	ArrayList<String> peFList;
+	ArrayList<String> finalList;
 
-	public Window() {
+	public Window() throws IOException {
 		list.setModel(listModel);
 		
 		String symbol = "";
@@ -60,7 +60,8 @@ public class Window extends JFrame implements MouseListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		  
 		for(int i=0; i<data.length; i++) {
 			symbol = data[i][0];
 			name = data[i][1];
@@ -71,22 +72,31 @@ public class Window extends JFrame implements MouseListener {
 			volume = data[i][6];
 			listModel.addElement(new StockItem(symbol,name,price,peTrailing,peForward,mktcap,volume));
 		}
-
+		
+		JLabel label1 = new JLabel();
 
 		splitPane.setLeftComponent(list);
-		EventQueue.invokeLater( new Runnable () {
-
-			@Override
-			public void run() {
-				slidingText();
+		list.getSelectionModel().addListSelectionListener(e -> {
+			StockItem p = list.getSelectedValue();
+			try {
+				String s = "resources/" + p.getSymbol() + ".png";
+				ImageIcon wPic = new ImageIcon(this.getClass().getResource(s));
+				label1.setIcon(wPic);	
 			}
-
+			catch(Exception ex) {
+				ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
+				label1.setIcon(wPic);	
+			}
+			label.setText(p.toString2());
+			label.setFont(roboto);
+			label.setForeground(Color.blue);
+			label.setLocation(label.getLocation().x, label.getLocation().y);
 		});
-
+		
 		list.setPreferredSize(new Dimension(150,50));
-
 		panel.add(label);
-
+		panel.add(label1);
+		panel.setBackground(Color.WHITE);
 		splitPane.setRightComponent(panel);
 		panel.setPreferredSize(new Dimension(1000,700));
 
@@ -96,30 +106,6 @@ public class Window extends JFrame implements MouseListener {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setResizable(false);
-	}
-
-	public void slidingText()
-	{
-		list.getSelectionModel().addListSelectionListener(e -> {
-			if(timer != null) {
-				timer.stop();
-			}
-			timer = new Timer( DELAY, new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					StockItem p = list.getSelectedValue();
-					label.setText(p.toString2());
-					label.setFont(roboto);
-					label.setForeground(Color.blue);
-					label.setLocation(label.getLocation().x, label.getLocation().y);
-					if(label.getLocation().x >= frame.getWidth()) {
-						label.setLocation(0-label.getWidth(),label.getLocation().y);
-					}
-				}
-			});
-			timer.start();
-		});
 	}
 	
 	public void getStockName() throws UnsupportedEncodingException, IOException{
@@ -232,6 +218,17 @@ public class Window extends JFrame implements MouseListener {
 				}
 				i++;
 			}
+		    FileWriter myWriter = new FileWriter("symbols.txt");
+		    int j = 0;
+			for(j=0; j<numStocks-1; j++){
+			      myWriter.write(listOfSymbols.get(j) + ",");
+			}
+			myWriter.write(listOfSymbols.get(j+1));
+			finalList = new ArrayList<String>();
+			for(int l=0; l<numStocks; l++) {
+				finalList.add(listOfSymbols.get(l));
+			}
+			myWriter.close();
 		}
 		catch (JauntException e) {
 			e.printStackTrace();
@@ -243,7 +240,12 @@ public class Window extends JFrame implements MouseListener {
 
 			@Override
 			public void run() {
-				new Window();
+				try {
+					new Window();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		});
