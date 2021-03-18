@@ -11,4 +11,4 @@ How to Download:
 
 git clone https://github.com/HaiderZak/s-and-p500-companies
 
-run Main.java
+simply goto stockapp -> src -> and run stockapp.jar
