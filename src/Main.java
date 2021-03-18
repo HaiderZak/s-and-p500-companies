@@ -76,7 +76,7 @@ public class Main extends JFrame implements MouseListener {
 
 		splitPane.setLeftComponent(list);
 		list.getSelectionModel().addListSelectionListener(e -> {
-			if(list.getSelectedIndex() <= numStocks) {
+			if(list.getSelectedIndex() < numStocks) {
 				Stock p = list.getSelectedValue();
 				try {
 					String s = "resources/" + p.getSymbol() + ".png";
