@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 public class Main extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 619845908650249193L;
-	final int numStocks = 30;
+	final int numStocks = 15;
 	JFrame frame = new JFrame("Top " + numStocks + " stocks in S&P 500 Market Index");
 	JList<Stock> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
@@ -76,20 +76,31 @@ public class Main extends JFrame implements MouseListener {
 
 		splitPane.setLeftComponent(list);
 		list.getSelectionModel().addListSelectionListener(e -> {
-			Stock p = list.getSelectedValue();
-			try {
-				String s = "resources/" + p.getSymbol() + ".png";
-				ImageIcon wPic = new ImageIcon(this.getClass().getResource(s));
-				label1.setIcon(wPic);	
+			if(list.getSelectedIndex() <= numStocks) {
+				Stock p = list.getSelectedValue();
+				try {
+					String s = "resources/" + p.getSymbol() + ".png";
+					ImageIcon wPic = new ImageIcon(this.getClass().getResource(s));
+					label1.setIcon(wPic);	
+				}
+				catch(Exception ex) {
+					ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
+					label1.setIcon(wPic);	
+				}
+				label.setText(p.toString2());
+				label.setFont(roboto);
+				label.setForeground(Color.blue);
+				label.setLocation(label.getLocation().x, label.getLocation().y);
 			}
-			catch(Exception ex) {
-				ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
-				label1.setIcon(wPic);	
+			else {
+				label.setText("");
+				try {
+					ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
+					label1.setIcon(wPic);	
+				}
+				catch(Exception ex) {
+				}
 			}
-			label.setText(p.toString2());
-			label.setFont(roboto);
-			label.setForeground(Color.blue);
-			label.setLocation(label.getLocation().x, label.getLocation().y);
 		});
 		
 		list.setPreferredSize(new Dimension(150,50));
