@@ -5,7 +5,6 @@ import com.jaunt.Elements;
 import com.jaunt.JauntException;
 import com.jaunt.Node;
 import com.jaunt.UserAgent;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +19,8 @@ import java.util.Scanner;
 public class Window extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 619845908650249193L;
 	JLabel L1, L2, L4, L5;
-	JFrame frame = new JFrame("Market Index: S&P 500");
+	final int numStocks = 5;
+	JFrame frame = new JFrame("Top " + numStocks + " stocks in S&P 500 Market Index");
 	JList<StockItem> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
 	DefaultListModel<StockItem> listModel = new DefaultListModel<>();
@@ -38,20 +38,11 @@ public class Window extends JFrame implements MouseListener {
 	ArrayList<String> mktcp;
 	ArrayList<String> peTList;
 	ArrayList<String> peFList;
-	final int numStocks = 30;
 
 	public Window() {
-
-
 		list.setModel(listModel);
 		JScrollPane scroll = new JScrollPane(list);
-
-		try {
-			getSymbols();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
 		String symbol = "";
 		String name = "";
 		String price = "";
@@ -59,8 +50,8 @@ public class Window extends JFrame implements MouseListener {
 		String peForward = "";
 		String mktcap = "";
 		String volume = "";
-
 		try {
+			getSymbols();
 			getMarketPrice();
 			getRestOfMarketData();
 			getStockName();
@@ -120,7 +111,7 @@ public class Window extends JFrame implements MouseListener {
 					label.setText(p.toString2());
 					label.setFont(roboto);
 					label.setForeground(Color.blue);
-					label.setLocation(label.getLocation().x+1, label.getLocation().y);
+					label.setLocation(label.getLocation().x, label.getLocation().y);
 					if(label.getLocation().x >= frame.getWidth()) {
 						label.setLocation(0-label.getWidth(),label.getLocation().y);
 					}
@@ -176,19 +167,19 @@ public class Window extends JFrame implements MouseListener {
 			peFList = new ArrayList<String>();
 			for(int i=0; i<finalArr.size()-1; i++) {
 				if(finalArr.get(i).contains("Volume")) {
-					volume = finalArr.get(i+1).replaceAll("\\D+","");
+					volume = finalArr.get(i+1).replaceAll("[^0-9.]", "");
 					vol.add(volume);
 				}
 				if(finalArr.get(i).contains("Market")) {
-					mktcap = finalArr.get(i+1).replaceAll("\\D+","");
+					mktcap = finalArr.get(i+1).replaceAll("[^0-9.]", "");
 					mktcp.add(mktcap);
 				}
 				if(finalArr.get(i).contains("Trailing")) {
-					peTrailing = finalArr.get(i+1).replaceAll("\\D+","");
+					peTrailing = finalArr.get(i+1).replaceAll("[^0-9.]", "");
 					peTList.add(peTrailing);
 				}
 				if(finalArr.get(i).contains("Forward")) {
-					peForward = finalArr.get(i+1).replaceAll("\\D+","");
+					peForward = finalArr.get(i+1).replaceAll("[^0-9.]", "");
 					peFList.add(peForward);
 				}
 			}
