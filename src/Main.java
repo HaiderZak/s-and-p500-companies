@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 public class Main extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 619845908650249193L;
-	final int numStocks = 15;
+	final int numStocks = 25;
 	JFrame frame = new JFrame("Top " + numStocks + " stocks in S&P 500 Market Index");
 	JList<Stock> list = new JList<>();
 	JSplitPane splitPane = new JSplitPane();
@@ -232,7 +232,7 @@ public class Main extends JFrame implements MouseListener {
 			FileWriter myWriter = new FileWriter("symbols.txt");
 		    int j = 0;
 			for(j=0; j<numStocks-1; j++){
-			      myWriter.write(listOfSymbols.get(j) + ",");
+				myWriter.write(listOfSymbols.get(j).replace('.', '-') + ",");
 			}
 			myWriter.write(listOfSymbols.get(j+1));
 			finalList = new ArrayList<String>();

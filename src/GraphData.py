@@ -14,7 +14,8 @@ class GraphData:
         label = yf.Ticker(self.ticker)
         company_name = label.info['longName']
         plt.title(company_name + " Price Chart")
-        plt.savefig('src/resources/' + self.ticker + '.png')  
+        plt.savefig('src/resources/' + self.ticker + '.png')
+        plt.clf()  
 
 
 f = open("symbols.txt")
