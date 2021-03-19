@@ -168,7 +168,7 @@ public class Main extends JFrame implements MouseListener {
 					vol.add(volume);
 				}
 				if(finalArr.get(i).contains("Market")) {
-					mktcap = finalArr.get(i+1).replaceAll("[^0-9.]", "");
+					mktcap = finalArr.get(i+1).substring(4,finalArr.get(i+1).length()-5);
 					mktcp.add(mktcap);
 				}
 				if(finalArr.get(i).contains("Trailing")) {
