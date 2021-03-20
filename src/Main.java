@@ -93,13 +93,7 @@ public class Main extends JFrame implements MouseListener {
 				label.setLocation(label.getLocation().x, label.getLocation().y);
 			}
 			else {
-				label.setText("");
-				try {
-					ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
-					label1.setIcon(wPic);	
-				}
-				catch(Exception ex) {
-				}
+				list.setSelectedIndex(numStocks-1);
 			}
 		});
 		
