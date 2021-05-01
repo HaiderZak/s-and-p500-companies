@@ -7,13 +7,17 @@ import com.jaunt.Elements;
 import com.jaunt.JauntException;
 import com.jaunt.Node;
 import com.jaunt.UserAgent;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -81,7 +85,12 @@ public class Main extends JFrame implements MouseListener {
 				try {
 					String s = "resources/" + p.getSymbol() + ".png";
 					ImageIcon wPic = new ImageIcon(this.getClass().getResource(s));
-					label1.setIcon(wPic);	
+					label1.setIcon(wPic);	    
+//					String path = "http://zakhaider.com/resources/" + p.getSymbol() + ".png";
+//				    URL url = new URL(path);
+//				    BufferedImage image = ImageIO.read(url);
+//				    ImageIcon icon = new ImageIcon(image);
+//				    label1.setIcon(icon);
 				}
 				catch(Exception ex) {
 					ImageIcon wPic = new ImageIcon(this.getClass().getResource("error.png"));
@@ -258,7 +267,6 @@ public class Main extends JFrame implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
 	}
 
 	@Override
@@ -271,7 +279,6 @@ public class Main extends JFrame implements MouseListener {
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-
 	}
 
 	@Override
