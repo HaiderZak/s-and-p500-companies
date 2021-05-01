@@ -11,4 +11,6 @@ git clone https://github.com/HaiderZak/s-and-p500-companies
 
 Simply goto src directory and run stockapp.jar
 
+Make sure to have latest JDK installed
+
 ![Top 15 stocks in SP 500 Market Index 2021-03-18 19-16-29_Trim](https://user-images.githubusercontent.com/37321974/111709889-e1958100-881e-11eb-8e91-b92580658ad2.gif)
